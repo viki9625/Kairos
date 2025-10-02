@@ -18,3 +18,4 @@ evaluate
 accelerate
 torch
 sentencepiece
+pydantic_settings
