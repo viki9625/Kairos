@@ -19,3 +19,4 @@ accelerate
 torch
 sentencepiece
 pydantic_settings
+argon2-cffi
