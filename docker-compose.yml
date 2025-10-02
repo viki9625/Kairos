@@ -14,16 +14,16 @@ services:
     env_file:
       - ./backend/.env
 
-  frontend:
-    build: ./frontend
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/usr/src/app
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # frontend:
+  #   build: ./frontend
+  #   container_name: frontend
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./frontend:/usr/src/app
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
   mongodb:
     image: mongo:6.0
