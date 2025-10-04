@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     mongodb_db: str = Field("mental_wellness", alias="MONGODB_DB")
     redis_url: str = Field("redis://localhost:6379/0", alias="REDIS_URL")
     fernet_key: str = Field(..., alias="FERNET_KEY")
+    
+    # Groq API Configuration
+    groq_api_key: str = Field(..., alias="GROQ_API_KEY")
+    groq_model: str = Field("mixtral-8x7b-32768", alias="GROQ_MODEL")
 
     # ✅ v2 style config
     model_config = SettingsConfigDict(

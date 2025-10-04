@@ -10,13 +10,6 @@ httpx
 celery[redis]
 redis
 cryptography
-sentence-transformers
-huggingface_hub[hf_xet]
-transformers==4.56.2
-datasets
-evaluate
-accelerate
-torch
-sentencepiece
+groq
 pydantic_settings
 argon2-cffi
