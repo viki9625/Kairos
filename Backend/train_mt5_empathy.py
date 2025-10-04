@@ -50,7 +50,7 @@ def train_mt5_empathy(input_csv="data/empathy.csv", output_dir="output/mt5-empat
 
     training_args = Seq2SeqTrainingArguments(
         output_dir=output_dir,
-        evaluation_strategy="no",        # "no", "steps", or "epoch"
+        evaluation_strategy="steps",        # "no", "steps", or "epoch"
         learning_rate=5e-5,
         per_device_train_batch_size=8,
         num_train_epochs=3,
@@ -81,3 +81,4 @@ def train_mt5_empathy(input_csv="data/empathy.csv", output_dir="output/mt5-empat
 
 if __name__ == "__main__":
     train_mt5_empathy()
+
