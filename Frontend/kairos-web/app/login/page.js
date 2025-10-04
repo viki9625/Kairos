@@ -14,7 +14,7 @@ export default function LoginPage() {
             Welcome Back
           </h2>
           <p className="mt-2 text-center text-sm text-[#aff7ff]">
-            Log in to continue your wellness journey.
+            Log In to continue your wellness journey.
           </p>
         </div>
 

@@ -23,7 +23,7 @@ export default function WelcomePage() {
             </Link>
             <Link href={"/login"}>
               <button className="bg-[#54acbf] px-5 py-2 rounded-full font-semibold">
-                <span>Log in</span>
+                <span>Log In</span>
               </button>
             </Link>
           </div>

@@ -15,7 +15,7 @@ const mockChatHistoryList = [
 
 const initialChatHistory = [
   {
-    sender: "Sora",
+    sender: "Kairos",
     text: "Hello! I'm here to listen. How are you feeling today?",
   },
 ];
@@ -66,36 +66,33 @@ export default function Home() {
 
       if (!response.ok) {
         // ... (Error handling remains the same)
-        const soraMessage = { sender: "Sora", text: "Error: Could not connect to AI." };
-        setChatMessages((prev) => [...prev, soraMessage]);
+        const KairosMessage = { sender: "Kairos", text: "Error: Could not connect to AI." };
+        setChatMessages((prev) => [...prev, KairosMessage]);
         return;
       }
 
       const data = await response.json();
-      const soraMessage = { sender: "Sora", text: data.text };
-      setChatMessages((prev) => [...prev, soraMessage]);
+      const KairosMessage = { sender: "Kairos", text: data.text };
+      setChatMessages((prev) => [...prev, KairosMessage]);
     } catch (error) {
       console.error("Frontend error:", error);
-      const soraMessage = { sender: "Sora", text: "Sorry, a connection error occurred." };
-      setChatMessages((prev) => [...prev, soraMessage]);
+      const KairosMessage = { sender: "Kairos", text: "Sorry, a connection error occurred." };
+      setChatMessages((prev) => [...prev, KairosMessage]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Chat message bubble component (extracted for cleaner main return)
+  // Chat message bubble component
   const ChatMessage = ({ msg }) => {
     const isUser = msg.sender === "You";
     return (
-      <div
-        className={`mb-4 flex ${isUser ? "justify-end" : "justify-start"}`}
-      >
-        {/* Sora Avatar/Name for AI message */}
+      <div className={`mb-4 flex ${isUser ? "justify-end" : "justify-start"}`}>
         {!isUser && (
           <div className="w-8 h-8 rounded-full mr-2 flex-shrink-0">
             <Image
               src="/chatbot_logo.svg"
-              alt="Sora Avatar"
+              alt="Kairos Avatar"
               width={32}
               height={32}
             />
@@ -103,22 +100,19 @@ export default function Home() {
         )}
 
         <div
-          className={`px-3 py-2 max-w-[75%] rounded-xl text-sm ${
+          className={`px-3 py-2 max-w-[75%] rounded-xl text-sm break-words ${
             isUser
-              ? "bg-[#54acbf] text-white rounded-br-none" // User bubble
-              : "bg-[#a7ebf2] text-[#023859] rounded-bl-none" // Sora bubble
+              ? "bg-[#54acbf] text-white rounded-tr-none"
+              : "bg-[#a7ebf2] text-[#023859] rounded-tl-none"
           }`}
         >
-          {/* Removed sender name block from inside the bubble as per the SS, 
-              but kept it in the data structure for logic. */}
-          <span className="leading-relaxed">{msg.text}</span>
+          <span className="leading-relaxed flex-shrink-0 whitespace-pre-wrap">{msg.text}</span>
         </div>
         
-        {/* User Avatar/Name for User message */}
         {isUser && (
           <div className="w-8 h-8 rounded-full ml-2 flex-shrink-0">
             <Image
-              src="/user.png" // Assuming you have a user avatar image
+              src="/user.png"
               alt="You Avatar"
               width={32}
               height={32}
@@ -270,29 +264,29 @@ export default function Home() {
           {/* Chat Messages Display Area */}
           <div
             className="flex-1 p-4 overflow-y-auto hide-scrollbar"
-             style={{ maxHeight: "62vh" }}
+            style={{ height: "calc(100vh - 240px)" }}
           >
-            <div className="max-w-4xl mx-auto"> {/* Centered content */}
+            <div className="max-w-4xl mx-auto space-y-4"> {/* Added space-y-4 for consistent spacing */}
               {chatMessages.map((msg, idx) => (
                 <ChatMessage key={idx} msg={msg} />
               ))}
-              {/* Sora is typing indicator */}
+              {/* Kairos is typing indicator */}
               {isLoading && (
                 <div className="flex items-start">
                   <div className="w-8 h-8 rounded-full mr-2 flex-shrink-0">
                     <Image
                       src="/chatbot_logo.svg"
-                      alt="Sora"
+                      alt="Kairos"
                       width={32}
                       height={32}
                     />
                   </div>
                   <div className="rounded-xl p-3 max-w-[80%] text-[#a7ebf2] animate-pulse">
-                    <span className="text-sm">Sora is typing...</span>
+                    <span className="text-sm">Kairos is typing...</span>
                   </div>
                 </div>
               )}
-              <div ref={messageEndRef} /> {/* Scroll target */}
+              <div ref={messageEndRef} />
             </div>
           </div>
           
