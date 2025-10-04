@@ -13,3 +13,4 @@ cryptography
 groq
 pydantic_settings
 argon2-cffi
+authlib

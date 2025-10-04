@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 class Settings(BaseSettings):
+    # --- Existing Settings ---
     secret_key: str = Field(..., alias="SECRET_KEY")
     algorithm: str = Field("HS256", alias="ALGORITHM")
     access_token_expire_minutes: int = Field(60 * 24 * 7, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
@@ -14,12 +15,16 @@ class Settings(BaseSettings):
     groq_api_key: str = Field(..., alias="GROQ_API_KEY")
     groq_model: str = Field("mixtral-8x7b-32768", alias="GROQ_MODEL")
 
-    # ✅ v2 style config
+    # --- New Google OAuth Settings ---
+    google_client_id: str = Field(..., alias="GOOGLE_CLIENT_ID")
+    google_client_secret: str = Field(..., alias="GOOGLE_CLIENT_SECRET")
+
+    # --- Pydantic V2 Style Config ---
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        populate_by_name=True,    # allow using field names
-        case_sensitive=False      # allow uppercase in .env
+        populate_by_name=True,  # allow using field names
+        case_sensitive=False,   # allow uppercase in .env
     )
 
 settings = Settings()

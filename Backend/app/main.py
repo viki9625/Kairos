@@ -1,24 +1,46 @@
 from fastapi import FastAPI
-from core.config import settings
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from api import auth as auth_router
 from api import chat as chat_router
-from api import admin as admin_router
-from db.base import init_db
+from core.config import settings
+from db.session import init_db  # <-- Make sure this import is here
 
+app = FastAPI(title="Kairos Wellness Companion")
 
-app = FastAPI(title='Mental Wellness API', version='1.0.0')
+# --- CORS Middleware ---
+origins = [
+    "http://localhost:3000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+# ----------------------
 
+# SessionMiddleware for Google Login
+app.add_middleware(SessionMiddleware, secret_key=settings.secret_key)
 
+# --- This startup event handler is now UNCOMMENTED ---
 @app.on_event("startup")
-async def on_startup():
-	await init_db()
+async def startup_event():
+    """
+    This function runs when the application starts.
+    It initializes the database connection.
+    """
+    print("--- Application is starting up... ---")
+    await init_db()
+    print("--- Application startup complete. ---")
+# ----------------------------------------------------
 
-
+# Include your API routers
 app.include_router(auth_router.router)
 app.include_router(chat_router.router)
-app.include_router(admin_router.router)
 
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Kairos API"}
 
-@app.get("/health")
-async def health():
-	return {"status": "ok"}
