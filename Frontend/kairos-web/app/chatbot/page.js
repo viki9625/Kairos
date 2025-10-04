@@ -133,7 +133,7 @@ export default function Home() {
           
           
           {/* Header/Chat Info */}
-          <div className="flex items-center justify-between px-4 py-3 border-b-2 border-gray-700 flex-shrink-0 z-10">
+          <div className="flex items-center justify-between px-4 py-3 border-b-2 border-gray-700 flex-shrink-0 ">
             <div className="flex items-center">
               <div className="rounded-full mr-4 w-10 h-10">
                 <Image
@@ -151,7 +151,7 @@ export default function Home() {
             
             {/* Hamburger/Menu Toggle Button (UPDATED) */}
             <button 
-              className="text-[#a7ebf2] hover:text-white p-1 transition-colors z-20" 
+              className="text-[#a7ebf2] hover:text-white p-1 transition-colors " 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle chat history menu"
             >
@@ -207,7 +207,7 @@ export default function Home() {
                 Previous Chats
               </h3>
               <button 
-              className="text-[#a7ebf2] hover:text-white p-1 transition-colors z-20" 
+              className="text-[#a7ebf2] hover:text-white p-1 transition-colors " 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle chat history menu"
             >
