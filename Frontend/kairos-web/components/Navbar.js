@@ -27,7 +27,7 @@ export default function Navbar() {
     const [userDetails, setUserDetails] = useState(null); // State to store fetched user details
     const profileRef = useRef(null); // Ref to detect clicks outside the dropdown
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     // 3. Effect to fetch user details when logged in
     useEffect(() => {
