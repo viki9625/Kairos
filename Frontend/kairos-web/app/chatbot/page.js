@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/app/context/AuthContext";
 
-const API_URL = "http://localhost:8081";
-const WS_URL = "ws://localhost:8081";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const WS_URL = process.env.NEXT_PUBLIC_WS_URL;
 
 // --- Reusable SVG Icons ---
 const MenuIcon = () => (

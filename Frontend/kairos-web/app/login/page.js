@@ -11,7 +11,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
