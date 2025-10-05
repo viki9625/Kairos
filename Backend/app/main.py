@@ -14,6 +14,7 @@ app = FastAPI(title="Kairos Wellness Companion")
 origins = [
     "http://localhost:3000",
     "http://34.56.91.122:3000",
+    "https://kairos-wine.vercel.app/",
 ]
 
 app.add_middleware(
