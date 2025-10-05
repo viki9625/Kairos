@@ -2,10 +2,12 @@
 
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function CallbackHandler() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { setUser } = useAuth();
 
     useEffect(() => {
         // This logic reads the token and user_id from the URL.
@@ -16,6 +18,9 @@ export default function CallbackHandler() {
             // If found, save them to local storage.
             localStorage.setItem('accessToken', token);
             localStorage.setItem('userId', userId);
+
+            // Directly update the global auth state
+            setUser({ token, userId });
             
             // Redirect to the chatbot page.
             router.push('/chatbot');
@@ -24,7 +29,7 @@ export default function CallbackHandler() {
             console.error("Google login callback is missing token or user_id.");
             router.push('/login');
         }
-    }, [router, searchParams]);
+    }, [router, searchParams, setUser]);
 
     // The loading message is now part of this client component.
     return (
@@ -36,3 +41,4 @@ export default function CallbackHandler() {
         </div>
     );
 }
+
