@@ -11,6 +11,7 @@ app = FastAPI(title="Kairos Wellness Companion")
 # --- CORS Middleware ---
 origins = [
     "http://localhost:3000",
+    "http://34.56.91.122:3000",
 ]
 app.add_middleware(
     CORSMiddleware,
