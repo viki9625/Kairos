@@ -38,7 +38,7 @@ export default function WelcomePage() {
     // show a loading spinner to prevent the welcome page from flashing.
     if (loading || user) {
         return (
-             <div className="bg-gradient-to-br from-[#a7ebf2] to-[#89d8e0] min-h-[84.5vh] flex items-center justify-center">
+             <div className="bg-gradient-to-br from-[#a7ebf2] to-[#89d8e0] min-h-[85.9vh] flex items-center justify-center">
                 <LoadingSpinner />
              </div>
         );
