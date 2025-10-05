@@ -1,38 +1,39 @@
-version: "3.9"
+version: '3.8'
 
 services:
+  # --- Backend Service (FastAPI) ---
   backend:
-    build: ./backend
-    container_name: backend
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
     ports:
-      - "8000:8000"
-    volumes:
-      - ./backend/app:/app
-    depends_on:
-      - mongodb
-    restart: unless-stopped
+      - "8081:8080"  # Map host port 8081 to container port 8080
     env_file:
-      - ./backend/.env
-
-  # frontend:
-  #   build: ./frontend
-  #   container_name: frontend
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./frontend:/usr/src/app
-  #   depends_on:
-  #     - backend
-  #   restart: unless-stopped
-
-  mongodb:
-    image: mongo:6.0
-    container_name: mongo
-    restart: unless-stopped
-    ports:
-      - "27018:27017"
+      - ./Backend/.env # Load environment variables from the backend's .env file
     volumes:
-      - mongo-data:/data/db
+      - ./Backend/app:/app # Optional: Mount for live code changes during development
 
-volumes:
-  mongo-data:
+  # --- Frontend Service (Next.js) ---
+  frontend:
+    build:
+      context: ./Frontend/kairos-web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    environment:
+      # This is crucial: It tells the frontend running inside Docker
+      # how to reach the backend service.
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend 
+
+
+### How to Use These Files
+
+# Now that you have all the necessary files, running your entire application is a single command.
+
+# 1.  **Open your terminal** in the root `Wellness` directory.
+# 2.  **Run the following command:**
+#     ```bash
+#     docker-compose up --build
+    
