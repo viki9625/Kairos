@@ -1,23 +1,23 @@
-# Use Node.js base image
+# Use Node LTS
 FROM node:18-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy dependency files
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy rest of the code
+# Copy the rest of the frontend code
 COPY . .
 
-# Build production files
+# Build the Next.js app
 RUN npm run build
 
-# Serve using a lightweight server
-RUN npm install -g serve
-CMD ["serve", "-s", "dist"]
+# Expose Next.js port
+EXPOSE 3000
 
-EXPOSE 5173
+# Start the Next.js app
+CMD ["npm", "start"]
