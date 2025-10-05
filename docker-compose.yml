@@ -1,40 +1,29 @@
-# --------------------------
-# Stage 1: Build Stage
-# --------------------------
-FROM node:18-alpine AS builder
+version: '3.8'
 
-WORKDIR /app
+services:
+  # --- Backend Service (FastAPI) ---
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"  # Map host port 8081 to container port 8080
+    env_file:
+      - ./Backend/.env # Load environment variables from the backend's .env file
+    volumes:
+      - ./Backend/app:/app # Optional: Mount for live code changes during development
 
-COPY package*.json ./
+  # --- Frontend Service (Next.js) ---
+  frontend:
+    build:
+      context: ./Frontend/kairos-web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Map host port 3000 to container port 3000
+    environment:
+      # This is crucial: It tells the frontend running inside Docker
+      # how to reach the backend service.
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend # Ensures the backend starts before the frontend
 
-RUN npm install
-
-COPY . .
-
-ENV NEXT_DISABLE_ESLINT true
-
-
-RUN npm run build
-
-
-FROM node:18-alpine AS runner
-
-WORKDIR /app
-
-
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
-
-
-RUN npm install --omit=dev
-
-
-ENV NODE_ENV=production
-ENV PORT=3000
-
-
-EXPOSE 3000
-
-
-CMD ["npm", "start"]
