@@ -9,7 +9,7 @@ services:
     ports:
       - "8081:8080"  # Map host port 8081 to container port 8080
     env_file:
-      - ./Backend/.env # Load environment variables from the backend's .env file
+      - ./Backend/app/.env # Load environment variables from the backend's .env file
     volumes:
       - ./Backend/app:/app # Optional: Mount for live code changes during development
 
@@ -26,4 +26,5 @@ services:
       NEXT_PUBLIC_API_URL: http://backend:8080
     depends_on:
       - backend # Ensures the backend starts before the frontend
+
 
