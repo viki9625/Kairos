@@ -46,7 +46,7 @@ export default function WelcomePage() {
     
     // If we are done loading and there is NO user, show the normal welcome page.
     return (
-        <div className="bg-gradient-to-br from-[#a7ebf2] to-[#89d8e0] min-h-[84.5vh] flex items-center justify-center overflow-hidden">
+        <div className="bg-gradient-to-br from-[#a7ebf2] to-[#89d8e0] min-h-[85.9vh] flex items-center justify-center overflow-hidden">
             <div className="container mx-auto px-6 py-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                     <div className="text-center md:text-left animate-fade-in-up">
