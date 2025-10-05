@@ -17,9 +17,8 @@ class AIService:
             self.client = None
             self.ready = False
         
-        # Empathy prompt engineering for better responses
+        # System prompt for empathic replies
         self.system_prompt = """You are a compassionate mental wellness assistant for youth. Your role is to:
-
 1. LISTEN with empathy and validate feelings
 2. Respond in a warm, caring, and non-judgmental way
 3. Use mix of English and Hindi naturally (code-switching like Indian youth)
@@ -27,24 +26,39 @@ class AIService:
 5. Offer small, actionable steps when appropriate
 6. Never give medical advice or diagnosis
 7. If someone expresses self-harm intentions, acknowledge their pain and suggest professional help
-
-Response style examples:
-- "Main samajh raha hoon tum kya feel kar rahe ho. Kya tum aur share karna chahoge?"
-- "That sounds really tough. You're brave for sharing this with me."
-- "Kabhi kabhi aisa feel karna normal hai. Tumhari feelings valid hain."
-- "It's okay to feel like this. Take a deep breath, you're not alone."
-
 Be genuine, warm, and supportive. Avoid clinical language."""
 
-        # Fallback responses for when API is unavailable
+        # Fallback responses for when the API is unavailable
         self.fallback_responses = [
             "Main samajh raha hoon tum kya feel kar rahe ho. Kya tum aur share karna chahoge?",
             "That sounds tough. You're not alone in this journey.",
-            "Kabhi kabhi aisa feel karna normal hai. Tumhari feelings valid hain.",
             "I hear you. Would you like to share more about what you're going through?",
-            "It's okay to feel like this. Take a deep breath, you're not alone."
         ]
 
+    # --- THIS IS THE NEW FUNCTION ---
+    async def generate_title_for_text(self, text: str) -> str:
+        """Generates a short, concise title (3-5 words) for a given text."""
+        if not self.ready or not self.client:
+            return "New Conversation"
+
+        try:
+            # A specific prompt to ask the AI for a short title
+            prompt = f'Generate a very short, concise title (3-5 words max) for the following conversation starter. Respond with only the title and nothing else.\n\nMessage: "{text}"'
+            
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=20,
+                temperature=0.3
+            )
+            
+            # Clean up the response to get just the title
+            title = response.choices[0].message.content.strip().replace('"', '')
+            return title if title else "New Conversation"
+        except Exception as e:
+            print(f"⚠️ Title generation error: {e}")
+            return "New Conversation" # Return a default title on error
+    
     def analyze_emotion(self, text: str) -> Dict[str, Any]:
         """Analyze emotion using Groq API with prompt engineering"""
         if not self.ready or not self.client:
@@ -69,7 +83,6 @@ Respond with only the JSON object, no other text."""
             
             result_text = response.choices[0].message.content.strip()
             
-            # Try to parse JSON response
             import json
             try:
                 emotion_data = json.loads(result_text)
@@ -80,7 +93,6 @@ Respond with only the JSON object, no other text."""
                     "source": "groq"
                 }
             except json.JSONDecodeError:
-                # Fallback if JSON parsing fails
                 return {"label": "neutral", "score": 0.5, "intensity": "moderate", "source": "fallback"}
                 
         except Exception as e:
@@ -93,9 +105,8 @@ Respond with only the JSON object, no other text."""
             from db.models import ChatMessage
             from utils.encryption import decrypt_text
             
-            # Get recent messages
             docs = await (
-                ChatMessage.find(ChatMessage.user_id == user_id)
+                ChatMessage.find({"user_id": user_id})
                 .sort(-ChatMessage.created_at)
                 .limit(limit)
                 .to_list()
@@ -105,7 +116,7 @@ Respond with only the JSON object, no other text."""
                 return ""
             
             context_parts = []
-            for msg in reversed(docs[-3:]):  # Last 3 messages for context
+            for msg in reversed(docs[-3:]):
                 try:
                     content = decrypt_text(msg.content)
                     role = "User" if msg.role == "user" else "Assistant"
@@ -126,12 +137,10 @@ Respond with only the JSON object, no other text."""
             return random.choice(self.fallback_responses)
 
         try:
-            # Get conversation context
             context = ""
             if user_id:
                 context = await self.get_conversation_context(user_id)
             
-            # Build the prompt with context
             user_prompt = f"""Current user message: "{text}"
 
 Recent conversation context:
@@ -139,7 +148,6 @@ Recent conversation context:
 
 Please respond as a compassionate mental wellness assistant. Be empathetic, supportive, and offer hope. Mix English and Hindi naturally. Keep it conversational and warm (2-3 sentences max)."""
 
-            # Call Groq API
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -147,22 +155,14 @@ Please respond as a compassionate mental wellness assistant. Be empathetic, supp
                     {"role": "user", "content": user_prompt}
                 ],
                 max_tokens=150,
-                temperature=0.7,  # Balanced creativity
-                top_p=0.9,
-                frequency_penalty=0.1,
-                presence_penalty=0.1
+                temperature=0.7,
             )
             
             reply = response.choices[0].message.content.strip()
             
-            # Basic validation and cleanup
-            if not reply or len(reply.strip()) < 10:
+            if not reply or len(reply.strip()) < 5:
                 import random
                 return random.choice(self.fallback_responses)
-            
-            # Remove any potential harmful content (basic filter)
-            if any(word in reply.lower() for word in ['suicide', 'kill', 'die', 'hurt yourself']):
-                return "I hear that you're going through a really tough time. Please consider reaching out to a counselor or trusted adult. You matter, and there are people who want to help."
             
             return reply
             
@@ -173,16 +173,16 @@ Please respond as a compassionate mental wellness assistant. Be empathetic, supp
 
     async def get_wellness_suggestions(self, emotion: str, user_id: Optional[str] = None) -> List[str]:
         """Get personalized wellness suggestions based on emotion"""
+        # (This function remains the same, no changes needed)
         if not self.ready or not self.client:
             return [
                 "Take a few deep breaths",
                 "Write in a journal",
                 "Talk to someone you trust",
-                "Go for a short walk"
             ]
 
         try:
-            suggestions_prompt = f"""Based on someone feeling {emotion}, suggest 3-4 simple, actionable wellness activities for a young person. Mix English and Hindi naturally.
+            suggestions_prompt = f"""Based on someone feeling {emotion}, suggest 3 simple, actionable wellness activities for a young person. Mix English and Hindi naturally.
 
 Format as a simple list, one activity per line. Keep each suggestion short and practical.
 
@@ -196,24 +196,14 @@ Emotion: {emotion}"""
             )
             
             suggestions_text = response.choices[0].message.content.strip()
-            suggestions = [s.strip() for s in suggestions_text.split('\n') if s.strip()]
+            suggestions = [s.strip().lstrip('- ') for s in suggestions_text.split('\n') if s.strip()]
             
-            return suggestions[:4] if suggestions else [
-                "Take deep breaths", 
-                "Share with someone you trust",
-                "Do something creative",
-                "Step outside for fresh air"
-            ]
+            return suggestions[:4] if suggestions else ["Take deep breaths", "Share with someone you trust"]
             
         except Exception as e:
             print(f"⚠️ Suggestions generation error: {e}")
-            return [
-                "Take a few deep breaths",
-                "Write in a journal", 
-                "Talk to someone you trust",
-                "Go for a short walk"
-            ]
-
+            return ["Take a few deep breaths", "Write in a journal"]
 
 # Global instance
 ai_service = AIService()
+

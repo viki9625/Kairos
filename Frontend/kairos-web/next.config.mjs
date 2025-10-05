@@ -1,12 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // --- THIS IS THE FIX ---
-  // This line tells Next.js not to fail the production build
-  // if there are any ESLint (code style) errors.
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  
+  // --- THIS IS THE FIX ---
+  // This section tells Next.js that it's safe to load images
+  // from Google's user content domain.
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   // -------------------------
 };
 
 export default nextConfig;
+

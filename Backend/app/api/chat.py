@@ -1,52 +1,50 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 from typing import List
+from pydantic import BaseModel
 
-# Import the new manager and services
 from core.websocket_manager import manager
 from services import chat_service
-from db.models import ChatMessage # Your existing model
+from db.models import ChatMessage
 
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
 
-class ChatMessageResponse(ChatMessage):
-    """A Pydantic model to control the response, ensuring content is a string."""
+class ChatMessageResponse(BaseModel):
+    """A Pydantic model to define the shape of a chat message response."""
+    role: str
     content: str
 
-# --- CORRECTED HISTORY ENDPOINT ---
+# --- REVERTED: A single endpoint to get all messages for a user ---
 @router.get("/history/{user_id}", response_model=List[ChatMessageResponse])
 async def get_chat_history(user_id: str):
     """Gets the decrypted chat history for a specific user."""
     try:
-        # Call the service function to get the decrypted history
-        history = await chat_service.get_user_chat_history(user_id)
-        return history
+        # Call the simplified service function
+        messages = await chat_service.get_user_chat_history(user_id)
+        # Convert the database objects to the response model format
+        return [{"role": msg.role, "content": msg.content} for msg in messages]
     except Exception as e:
-        # Handle potential errors during history retrieval
         print(f"Error fetching history for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Could not retrieve chat history.")
 
 
-# --- CORRECTED WEBSOCKET ENDPOINT ---
+# --- REVERTED: A simplified WebSocket endpoint ---
 @router.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: str):
-    """Handles the real-time WebSocket connection for an authenticated user."""
+    """Handles the real-time WebSocket connection for a user."""
     await manager.connect(websocket, user_id)
     try:
         while True:
-            # Wait for a message from the client (e.g., {'message': 'Hello'})
+            # It now only expects a simple message, not a conversation_id
             data = await websocket.receive_json()
             user_message = data.get("message")
 
             if user_message:
-                # Use the service to process the message (save, get AI reply, broadcast)
+                # Call the simplified service function
                 await chat_service.process_user_message(user_id, user_message)
 
     except WebSocketDisconnect:
-        # If the user disconnects, remove their connection from the manager
         manager.disconnect(user_id)
-        print(f"User {user_id} disconnected.")
     except Exception as e:
-        # Handle any other errors that might occur
-        print(f"An error occurred in the websocket for user {user_id}: {e}")
+        print(f"Error in websocket for user {user_id}: {e}")
         manager.disconnect(user_id)
 
