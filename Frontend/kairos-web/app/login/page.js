@@ -51,7 +51,7 @@ export default function LoginPage() {
 
     return (
         // This outer container fills the available height and centers the form card.
-        <div className="min-h-[84.5vh] bg-[#a7ebf2] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-[85.9vh] bg-[#a7ebf2] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             {/* This is the form card. We removed the `space-y-8` class from here to prevent
               it from stretching vertically. We'll add spacing to the elements inside instead.
             */}

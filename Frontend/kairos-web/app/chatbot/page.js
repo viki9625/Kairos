@@ -115,7 +115,8 @@ export default function ChatbotPage() {
     
     if (authLoading || !user) {
         return (
-             <div className="bg-[#a7ebf2] w-full min-h-[84.5vh] flex items-center justify-center">
+             <div className="bg-[#a7ebf2] w-full min-h-screen
+              flex items-center justify-center">
                 <div className="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-[#023859]"></div>
              </div>
         );
