@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
@@ -10,7 +9,6 @@ export function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Check for user credentials in local storage when the app loads
         const token = localStorage.getItem('accessToken');
         const userId = localStorage.getItem('userId');
         if (token && userId) {
@@ -20,9 +18,19 @@ export function AuthProvider({ children }) {
     }, []);
 
     const logout = () => {
+        // --- DEBUGGING: Checkpoint A ---
+        console.log("AuthContext: logout() function has been called.");
+        
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userId');
+        
+        // --- DEBUGGING: Checkpoint B ---
+        console.log("AuthContext: localStorage has been cleared.");
+
         setUser(null);
+        
+        // --- DEBUGGING: Checkpoint C ---
+        console.log("AuthContext: Global user state has been set to null.");
     };
 
     return (
@@ -32,5 +40,5 @@ export function AuthProvider({ children }) {
     );
 }
 
-// Custom hook to use the auth context easily in other components
 export const useAuth = () => useContext(AuthContext);
+

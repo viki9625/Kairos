@@ -3,13 +3,12 @@ from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from starlette.responses import RedirectResponse # Ensure this is imported
+from starlette.responses import RedirectResponse
 
 from db.models import User
 from core.security import create_access_token
 from core.oauth import oauth
 
-# (Your existing router, pwd_context, and Pydantic models remain the same)
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
@@ -23,13 +22,13 @@ class TokenResp(BaseModel):
     token_type: str = "bearer"
     user_id: str
 
-# (Your existing /register and /token endpoints remain the same)
 @router.post("/register", response_model=TokenResp)
 async def register(payload: RegisterReq):
+    # This endpoint remains the same
     if not payload.anonymous and not payload.password:
         raise HTTPException(status_code=400, detail="Password required for non-anonymous users")
     if payload.username:
-        existing = await User.find_one(User.username == payload.username)
+        existing = await User.find_one({"username": payload.username})
         if existing:
             raise HTTPException(status_code=400, detail="Username already exists")
     hashed_password = pwd_context.hash(payload.password) if payload.password else None
@@ -45,7 +44,8 @@ async def register(payload: RegisterReq):
 
 @router.post("/token", response_model=TokenResp)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await User.find_one(User.username == form_data.username)
+    # This endpoint remains the same
+    user = await User.find_one({"username": form_data.username})
     if not user or not user.hashed_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     try:
@@ -57,38 +57,50 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": token, "token_type": "bearer", "user_id": str(user.id)}
 
 
-# --- Google OAuth2 Endpoints ---
-
+# --- THIS IS THE FIXED FUNCTION ---
 async def get_or_create_google_user(user_info: dict) -> User:
-    user = await User.find_one(User.google_id == user_info['sub'])
-    if user: return user
-    user = await User.find_one(User.email == user_info['email'])
+    """
+    Finds a user by Google ID or email. Creates a new user if one doesn't exist.
+    Crucially, it now saves or updates the profile picture URL in all cases.
+    """
+    # Case 1: User has logged in with Google before.
+    user = await User.find_one({"google_id": user_info['sub']})
+    if user:
+        # Update their picture in case it has changed since their last login.
+        user.profile_picture_url = user_info.get('picture')
+        await user.save()
+        return user
+
+    # Case 2: User has a local account with the same email. Link it to Google.
+    user = await User.find_one({"email": user_info['email']})
     if user:
         user.google_id = user_info['sub']
         user.provider = "google"
+        user.profile_picture_url = user_info.get('picture') # <-- Add picture
         await user.save()
         return user
+
+    # Case 3: This is a brand new user.
     new_user = User(
         email=user_info['email'],
         username=user_info.get('name'),
         google_id=user_info['sub'],
         provider="google",
         is_anonymous=False,
+        profile_picture_url=user_info.get('picture') # <-- Add picture
     )
     await new_user.insert()
     return new_user
 
 @router.get('/google/login')
 async def google_login(request: Request):
-    """Redirects the user to Google's authentication page."""
+    # This endpoint remains the same
     redirect_uri = request.url_for('google_auth_callback')
     return await oauth.google.authorize_redirect(request, str(redirect_uri))
 
-
-# --- THIS IS THE FIXED FUNCTION ---
 @router.get('/google/auth')
 async def google_auth_callback(request: Request):
-    """Handles the callback from Google and REDIRECTS to the frontend."""
+    # This endpoint remains the same
     try:
         token_data = await oauth.google.authorize_access_token(request)
     except Exception as e:
@@ -102,7 +114,6 @@ async def google_auth_callback(request: Request):
     
     access_token = create_access_token(subject=str(user.id), expires_delta=timedelta(days=30))
     
-    # Instead of returning JSON, we now build a URL and redirect the user's browser.
     frontend_url = f"http://localhost:3000/auth/callback?token={access_token}&user_id={str(user.id)}"
     return RedirectResponse(url=frontend_url)
 
