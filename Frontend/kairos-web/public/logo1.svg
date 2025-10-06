@@ -1,0 +1,17 @@
+<svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none">
+    {/* This is the white circle representing wholeness and well-being. */}
+    <circle 
+        cx="50" 
+        cy="50" 
+        r="45" 
+        stroke="white" 
+        stroke-width="10"
+    />
+    {/* This is the abstract "K" path, representing the user's journey. */}
+    <path
+        stroke="white"
+        stroke-width="10"
+        stroke-linecap="round"
+        d="M30 70 V 40 Q 50 30, 70 20"
+    />
+</svg>
