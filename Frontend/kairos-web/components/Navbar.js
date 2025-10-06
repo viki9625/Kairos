@@ -113,7 +113,7 @@ export default function Navbar() {
         <nav className="bg-[#011c40] p-4 shadow-md relative z-40">
             <div className="mx-auto flex justify-between items-center">
                 <Link href="/" className="z-20 flex items-center gap-3 text-[#a7ebf2] text-2xl font-bold tracking-wider whitespace-nowrap" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Image src={"/logo.png"} width={40} height={40} alt="KAIROS logo" />
+                    <Image src={"/logo.png"} width={40} height={40} alt="KAIROS logo" suppressHydrationWarning={true}/>
                     <div>KAIROS</div>
                 </Link>
                 <div className="flex items-center gap-4">
