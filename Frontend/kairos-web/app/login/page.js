@@ -13,7 +13,7 @@ export default function LoginPage() {
     const router = useRouter();
     const { setUser } = useAuth(); // <-- 2. Get the setUser function from the context
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
