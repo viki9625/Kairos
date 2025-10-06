@@ -19,7 +19,7 @@ export default function Navbar() {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [userDetails, setUserDetails] = useState(null);
     const profileRef = useRef(null);
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
     useEffect(() => {
         if (user?.token) {
